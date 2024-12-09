@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'widget/calcurator_button.dart';
 import 'widget/currrency_card.dart';
@@ -16,6 +17,20 @@ class _CalcuratorHomePageState extends State<CalcuratorHomePage> {
   double num1 = 0.0;
   double num2 = 0.0;
   String operand = "";
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.requestFocus();
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
   //버튼이 눌렸을 때 호출되는 함수
   buttonPressed(String buttonText) {
     if (buttonText == "C") {
@@ -59,136 +74,179 @@ class _CalcuratorHomePageState extends State<CalcuratorHomePage> {
       // 숫자를 입력할 때마다 현재 출력 값에 추가 합니다.
       _output += buttonText;
     }
-    //UI를 업데이트하고 계산 결과를 표시합니다.
+    //상태 set
     setState(() {
       output = double.parse(_output).toStringAsFixed(2);
     });
   }
 
+  _handleKeyEvent(RawKeyEvent event) {
+    if (event is RawKeyDownEvent) {
+      final key = event.logicalKey;
+      if (key == LogicalKeyboardKey.digit0 ||
+          key == LogicalKeyboardKey.numpad0) {
+        buttonPressed('0');
+      } else if (key == LogicalKeyboardKey.digit1 ||
+          key == LogicalKeyboardKey.numpad1) {
+        buttonPressed('1');
+      } else if (key == LogicalKeyboardKey.digit2 ||
+          key == LogicalKeyboardKey.numpad2) {
+        buttonPressed('2');
+      } else if (key == LogicalKeyboardKey.digit3 ||
+          key == LogicalKeyboardKey.numpad3) {
+        buttonPressed('3');
+      } else if (key == LogicalKeyboardKey.digit4 ||
+          key == LogicalKeyboardKey.numpad4) {
+        buttonPressed('4');
+      } else if (key == LogicalKeyboardKey.digit5 ||
+          key == LogicalKeyboardKey.numpad5) {
+        buttonPressed('5');
+      } else if (key == LogicalKeyboardKey.digit6 ||
+          key == LogicalKeyboardKey.numpad6) {
+        buttonPressed('6');
+      } else if (key == LogicalKeyboardKey.digit7 ||
+          key == LogicalKeyboardKey.numpad7) {
+        buttonPressed('7');
+      } else if (key == LogicalKeyboardKey.digit8 ||
+          key == LogicalKeyboardKey.numpad8) {
+        buttonPressed('8');
+      } else if (key == LogicalKeyboardKey.digit9 ||
+          key == LogicalKeyboardKey.numpad9) {
+        buttonPressed('9');
+      }
+    }
+  }
+
   @override // auto complete 됨.
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: const Color(0xFF181818),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 80,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const Text(
-                          'SEX',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        Text(
-                          '섹스',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.5),
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 70,
-                ),
-                Text(
-                  "Total",
-                  style: TextStyle(
-                    fontSize: 22,
-                    color: Colors.white.withOpacity(0.8),
+    // return MaterialApp(
+    //   home: Scaffold(
+    return RawKeyboardListener(
+        focusNode: _focusNode,
+        onKey: _handleKeyEvent,
+        autofocus: true,
+        child: Scaffold(
+          backgroundColor: const Color(0xFF181818),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 80,
                   ),
-                ),
-                // 계산 결과를 표시할 화면 삽입
-                Container(
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 24.0, horizontal: 12.0),
-                  child: Text(
-                    output,
-                    style: const TextStyle(
-                        fontSize: 44.0,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const Text(
+                            'SEX',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Text(
+                            '섹스',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.5),
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                const CurrencyCard(
-                  name: 'Dollar',
-                  code: 'USD',
-                  amount: '428',
-                  icon: Icons.attach_money_outlined,
-                  isInverted: false,
-                  offset: -40,
-                ),
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        CalcuratorButton("C", buttonPressed),
-                        CalcuratorButton("()", buttonPressed),
-                        CalcuratorButton("%", buttonPressed),
-                        CalcuratorButton("/", buttonPressed),
-                      ],
+                  const SizedBox(
+                    height: 70,
+                  ),
+                  Text(
+                    "Total",
+                    style: TextStyle(
+                      fontSize: 22,
+                      color: Colors.white.withOpacity(0.8),
                     ),
-                    Row(
-                      children: [
-                        CalcuratorButton("7", buttonPressed),
-                        CalcuratorButton("8", buttonPressed),
-                        CalcuratorButton("9", buttonPressed),
-                        CalcuratorButton("x", buttonPressed),
-                      ],
+                  ),
+                  // 계산 결과를 표시할 화면 삽입
+                  Container(
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 24.0, horizontal: 12.0),
+                    child: Text(
+                      output,
+                      style: const TextStyle(
+                          fontSize: 44.0,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white),
                     ),
-                    Row(
-                      children: [
-                        CalcuratorButton("4", buttonPressed),
-                        CalcuratorButton("5", buttonPressed),
-                        CalcuratorButton("6", buttonPressed),
-                        CalcuratorButton("-", buttonPressed),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        CalcuratorButton("1", buttonPressed),
-                        CalcuratorButton("2", buttonPressed),
-                        CalcuratorButton("3", buttonPressed),
-                        CalcuratorButton("+", buttonPressed),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        CalcuratorButton("0", buttonPressed),
-                        CalcuratorButton("00", buttonPressed),
-                        CalcuratorButton(".", buttonPressed),
-                        CalcuratorButton("=", buttonPressed),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  const CurrencyCard(
+                    name: 'Dollar',
+                    code: 'USD',
+                    amount: '428',
+                    icon: Icons.attach_money_outlined,
+                    isInverted: false,
+                    offset: -40,
+                  ),
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          CalcuratorButton("C", buttonPressed),
+                          CalcuratorButton("()", buttonPressed),
+                          CalcuratorButton("%", buttonPressed),
+                          CalcuratorButton("/", buttonPressed),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          CalcuratorButton("7", buttonPressed),
+                          CalcuratorButton("8", buttonPressed),
+                          CalcuratorButton("9", buttonPressed),
+                          CalcuratorButton("x", buttonPressed),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          CalcuratorButton("4", buttonPressed),
+                          CalcuratorButton("5", buttonPressed),
+                          CalcuratorButton("6", buttonPressed),
+                          CalcuratorButton("-", buttonPressed),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          CalcuratorButton("1", buttonPressed),
+                          CalcuratorButton("2", buttonPressed),
+                          CalcuratorButton("3", buttonPressed),
+                          CalcuratorButton("+", buttonPressed),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          CalcuratorButton("0", buttonPressed),
+                          CalcuratorButton("00", buttonPressed),
+                          CalcuratorButton(".", buttonPressed),
+                          CalcuratorButton("=", buttonPressed),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
+          //   ),
+          // );
+        ));
   }
 }
